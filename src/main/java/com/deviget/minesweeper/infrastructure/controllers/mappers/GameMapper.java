@@ -6,8 +6,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GameMapper {
+	private final GridMapper gridMapper;
+
+	public GameMapper(GridMapper gridMapper) {
+		this.gridMapper = gridMapper;
+	}
 
 	public GameDTO domainToApi(Game game) {
-		return new GameDTO(game.getId());
+		return GameDTO.GameDTOBuilder.aGameDTO()
+				.withId(game.getId())
+				.withStatus(game.getStatus())
+				.withDuration(game.getDurationString())
+				.withGrid(gridMapper.domainToApi(game.getGrid()))
+				.build();
 	}
 }

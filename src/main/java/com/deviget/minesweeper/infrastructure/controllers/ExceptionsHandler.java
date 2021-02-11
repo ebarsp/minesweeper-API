@@ -1,6 +1,7 @@
 package com.deviget.minesweeper.infrastructure.controllers;
 
 import com.deviget.minesweeper.domain.InvalidStateException;
+import com.deviget.minesweeper.domain.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,11 @@ public class ExceptionsHandler {
 
 	@ExceptionHandler(InvalidStateException.class)
 	public ResponseEntity<Object> badRequestHandle(final Exception cause) {
-		LOG.error(cause.getMessage(), cause);
 		return ResponseEntity.badRequest().body(cause.getMessage());
+	}
+
+	@ExceptionHandler(NotFoundException.class)
+	public ResponseEntity<Object> notFoundHandle(final Exception cause) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(cause.getMessage());
 	}
 }

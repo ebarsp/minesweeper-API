@@ -8,15 +8,15 @@ public class Game {
 	private final UUID id;
 	private final GameGrid grid;
 	private final GameStatus status;
-	private final Duration duration;
-	private final LocalDateTime createdTime;
+	private Duration duration;
+	private LocalDateTime lastUpdateTime;
 
 	private Game(GameBuilder builder) {
 		this.id = builder.id;
 		this.grid = builder.grid;
 		this.status = builder.status;
 		this.duration = builder.duration;
-		this.createdTime = builder.createdTime;
+		this.lastUpdateTime = builder.lastUpdateTime;
 	}
 
 	public UUID getId() {
@@ -31,12 +31,20 @@ public class Game {
 		return status;
 	}
 
-	public Duration getDuration() {
-		return duration;
+	public String getDurationString() {
+		return String.format("%d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
 	}
 
-	public LocalDateTime getCreatedTime() {
-		return createdTime;
+	public void recalculateDuration() {
+		if (isOngoing()) {
+			final LocalDateTime now = LocalDateTime.now();
+			this.duration = Duration.between(lastUpdateTime, now);
+			this.lastUpdateTime = now;
+		}
+	}
+
+	private boolean isOngoing() {
+		return status.equals(GameStatus.ONGOING);
 	}
 
 	public static final class GameBuilder {
@@ -44,7 +52,7 @@ public class Game {
 		private GameGrid grid;
 		private GameStatus status;
 		private Duration duration;
-		private LocalDateTime createdTime;
+		private LocalDateTime lastUpdateTime;
 
 		private GameBuilder() {
 		}
@@ -73,13 +81,13 @@ public class Game {
 			return this;
 		}
 
-		public GameBuilder withCreationTime(LocalDateTime creationTime) {
-			this.createdTime = creationTime;
+		public GameBuilder withLastUpdateTime(LocalDateTime lastUpdateTime) {
+			this.lastUpdateTime = lastUpdateTime;
 			return this;
 		}
 
 		public Game build() {
-			if (id == null || grid == null || status == null || duration == null || createdTime == null) {
+			if (id == null || grid == null || status == null || duration == null || lastUpdateTime == null) {
 				throw new InvalidStateException("There are missed arguments");
 			}
 			return new Game(this);

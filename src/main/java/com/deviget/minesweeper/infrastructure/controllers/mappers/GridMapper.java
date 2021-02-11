@@ -1,17 +1,21 @@
 package com.deviget.minesweeper.infrastructure.controllers.mappers;
 
 import com.deviget.minesweeper.domain.GameGrid;
-import com.deviget.minesweeper.infrastructure.controllers.dtos.GridPayloadDTO;
+import com.deviget.minesweeper.infrastructure.controllers.dtos.GridDTO;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GridMapper {
 
-	public GameGrid apiToDomain(final GridPayloadDTO payload) {
+	public GridDTO domainToApi(final GameGrid grid) {
+		return new GridDTO(grid);
+	}
+
+	public GameGrid apiToDomain(final GridDTO grid) {
 		return GameGrid.GridBuilder.aGrid()
-				.withX(payload.getX())
-				.withY(payload.getY())
-				.withMines(payload.getMines())
+				.withX(grid.getX())
+				.withY(grid.getY())
+				.withMines(grid.getMines())
 				.build();
 	}
 }
