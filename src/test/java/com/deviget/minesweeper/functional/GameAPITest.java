@@ -25,7 +25,7 @@ public class GameAPITest {
 	private MockMvc mvc;
 
 	@Test
-	public void whenCreateAGame_thenReturnANewGame() throws Exception {
+	public void givenAGrid_whenCreateAGame_thenReturnANewGame() throws Exception {
 		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
 		mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
 				.andExpect(status().isCreated())
@@ -35,13 +35,13 @@ public class GameAPITest {
 	}
 
 	@Test
-	public void whenCreateAGameWithoutArguments_thenBadRequest() throws Exception {
+	public void givenNoGrid_whenCreateAGame_thenBadRequest() throws Exception {
 		mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content("{}"))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
-	public void whenGetACreatedGame_thenReturnTheOnGoingGame() throws Exception {
+	public void givenAGame_whenGetIt_thenReturnTheOnGoingGame() throws Exception {
 		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
 		final MvcResult result = mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
 				.andExpect(status().isCreated())
@@ -59,8 +59,50 @@ public class GameAPITest {
 	}
 
 	@Test
-	public void whenGetANonExistentGame_thenNotFound() throws Exception {
+	public void givenANonExistentGame_whenGetIt_thenNotFound() throws Exception {
 		mvc.perform(get("/v0/games/" + UUID.randomUUID().toString()).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	public void givenAnOngoingGame_whenPauseIt_thenGameIsPaused() throws Exception {
+		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
+		final MvcResult result = mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("game_id", notNullValue()))
+				.andReturn();
+
+		TimeUnit.SECONDS.sleep(2);
+
+		String gameId = JsonPath.read(result.getResponse().getContentAsString(), "$.game_id");
+		mvc.perform(post("/v0/games/" + gameId + "/pause").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("game_id", is(gameId)))
+				.andExpect(jsonPath("status", is("PAUSED")))
+				.andExpect(jsonPath("duration", is("0:00:02")));
+	}
+
+	@Test
+	public void givenAPausedGame_whenUnpauseIt_thenGameIsOngoing() throws Exception {
+		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
+		final MvcResult result = mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("game_id", notNullValue()))
+				.andReturn();
+
+		TimeUnit.SECONDS.sleep(2);
+
+		String gameId = JsonPath.read(result.getResponse().getContentAsString(), "$.game_id");
+		mvc.perform(post("/v0/games/" + gameId + "/pause").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("game_id", is(gameId)))
+				.andExpect(jsonPath("status", is("PAUSED")))
+				.andExpect(jsonPath("duration", is("0:00:02")));
+
+		mvc.perform(post("/v0/games/" + gameId + "/unpause").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("game_id", is(gameId)))
+				.andExpect(jsonPath("status", is("ONGOING")))
+				.andExpect(jsonPath("duration", is("0:00:02")));
 	}
 }

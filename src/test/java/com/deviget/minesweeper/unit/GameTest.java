@@ -3,6 +3,7 @@ package com.deviget.minesweeper.unit;
 import com.deviget.minesweeper.domain.Game;
 import com.deviget.minesweeper.domain.GameGrid;
 import com.deviget.minesweeper.domain.GameStatus;
+import com.deviget.minesweeper.domain.InvalidActionException;
 import com.deviget.minesweeper.domain.InvalidStateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -32,7 +34,7 @@ public class GameTest {
 	}
 
 	@Test
-	public void whenAnIncompleteGameIsBuilt_thenCannotCreateAGameWithInvalidState() {
+	public void givenAnIncompleteGame_whenItsBuilt_thenCannotCreateAGameWithInvalidState() {
 		Game.GameBuilder builder = Game.GameBuilder.aGame()
 				.withId(gameId);
 
@@ -52,7 +54,7 @@ public class GameTest {
 	}
 
 	@Test
-	public void whenAGameStarts_thenTheDurationOfTheGameBegins() throws InterruptedException {
+	public void givenAnGameStartedGame_whenRecalculateDurationAfterTwoSeconds_thenBothDurationAndLastUpdateAreChanged() throws InterruptedException {
 		Game game = Game.GameBuilder.aGame()
 				.withId(gameId)
 				.withStatus(GameStatus.ONGOING)
@@ -61,10 +63,95 @@ public class GameTest {
 				.withGrid(grid)
 				.build();
 
-		//keeps time running
+		LocalDateTime original = game.getLastUpdateTime();
+
 		TimeUnit.SECONDS.sleep(2);
 		game.recalculateDuration();
 
 		assertEquals("0:00:02", game.getDurationString());
+		assertNotEquals(original, game.getLastUpdateTime());
+	}
+
+	@Test
+	public void givenAnOngoingGame_whenTryPausedItAfterTwoSeconds_thenBothGameStatusAndDurationAreChanged() throws InterruptedException {
+		Game game = Game.GameBuilder.aGame()
+				.withId(gameId)
+				.withStatus(GameStatus.ONGOING)
+				.withDuration(Duration.ZERO)
+				.withLastUpdateTime(LocalDateTime.now())
+				.withGrid(grid)
+				.build();
+
+		TimeUnit.SECONDS.sleep(2);
+		game.pause();
+
+		assertEquals(GameStatus.PAUSED, game.getStatus());
+		assertEquals("0:00:02", game.getDurationString());
+	}
+
+	@Test
+	public void givenAPausedGame_whenTryPauseIt_thenItsAnInvalidAction() {
+		Game game = Game.GameBuilder.aGame()
+				.withId(gameId)
+				.withStatus(GameStatus.PAUSED)
+				.withDuration(Duration.ZERO)
+				.withLastUpdateTime(LocalDateTime.now())
+				.withGrid(grid)
+				.build();
+		assertThrows(InvalidActionException.class, game::pause);
+	}
+
+	@Test
+	public void givenAGameOver_whenTryPauseIt_thenItsAnInvalidAction() {
+		Game game = Game.GameBuilder.aGame()
+				.withId(gameId)
+				.withStatus(GameStatus.ENDED)
+				.withDuration(Duration.ZERO)
+				.withLastUpdateTime(LocalDateTime.now())
+				.withGrid(grid)
+				.build();
+		assertThrows(InvalidActionException.class, game::pause);
+	}
+
+	@Test
+	public void givenAPausedGame_whenTryUnpauseIt_thenBothGameStatusAndLastUpdateAreChanged() {
+		Game game = Game.GameBuilder.aGame()
+				.withId(gameId)
+				.withStatus(GameStatus.PAUSED)
+				.withDuration(Duration.ZERO)
+				.withLastUpdateTime(LocalDateTime.now())
+				.withGrid(grid)
+				.build();
+
+		LocalDateTime original = game.getLastUpdateTime();
+
+		game.unpause();
+
+		assertEquals(GameStatus.ONGOING, game.getStatus());
+		assertNotEquals(original, game.getLastUpdateTime());
+	}
+
+	@Test
+	public void givenAnOngoingGame_whenTryUnpauseIt_thenItsAnInvalidAction() {
+		Game game = Game.GameBuilder.aGame()
+				.withId(gameId)
+				.withStatus(GameStatus.ONGOING)
+				.withDuration(Duration.ZERO)
+				.withLastUpdateTime(LocalDateTime.now())
+				.withGrid(grid)
+				.build();
+		assertThrows(InvalidActionException.class, game::unpause);
+	}
+
+	@Test
+	public void givenAGameOver_whenTryUnpauseIt_thenItsAnInvalidAction() {
+		Game game = Game.GameBuilder.aGame()
+				.withId(gameId)
+				.withStatus(GameStatus.ENDED)
+				.withDuration(Duration.ZERO)
+				.withLastUpdateTime(LocalDateTime.now())
+				.withGrid(grid)
+				.build();
+		assertThrows(InvalidActionException.class, game::unpause);
 	}
 }

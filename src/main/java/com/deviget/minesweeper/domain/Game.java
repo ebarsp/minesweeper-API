@@ -7,7 +7,7 @@ import java.util.UUID;
 public class Game implements IGame {
 	private final UUID id;
 	private final GameGrid grid;
-	private final GameStatus status;
+	private GameStatus status;
 	private Duration duration;
 	private LocalDateTime lastUpdateTime;
 
@@ -39,6 +39,10 @@ public class Game implements IGame {
 		return String.format("%d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
 	}
 
+	public LocalDateTime getLastUpdateTime() {
+		return lastUpdateTime;
+	}
+
 	public void recalculateDuration() {
 		if (isOngoing()) {
 			final LocalDateTime now = LocalDateTime.now();
@@ -47,8 +51,32 @@ public class Game implements IGame {
 		}
 	}
 
+	public void pause() {
+		if (isGameOver() || isPaused()) {
+			throw new InvalidActionException();
+		}
+		recalculateDuration();
+		this.status = GameStatus.PAUSED;
+	}
+
+	public void unpause() {
+		if (isGameOver() || isOngoing()) {
+			throw new InvalidActionException();
+		}
+		this.status = GameStatus.ONGOING;
+		this.lastUpdateTime = LocalDateTime.now();
+	}
+
 	private boolean isOngoing() {
-		return status.equals(GameStatus.ONGOING);
+		return GameStatus.ONGOING.equals(status);
+	}
+
+	private boolean isPaused() {
+		return GameStatus.PAUSED.equals(status);
+	}
+
+	private boolean isGameOver() {
+		return GameStatus.ENDED.equals(status);
 	}
 
 	public static final class GameBuilder {

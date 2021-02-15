@@ -41,4 +41,14 @@ public class GameController {
 	public GameDTO get(@PathVariable UUID id) {
 		return gameMapper.domainToApi(gameService.get(id));
 	}
+
+	@PostMapping("/{id}/pause")
+	public GameDTO pause(@PathVariable UUID id) {
+		return gameMapper.domainToApi(gameService.pause(id));
+	}
+
+	@PostMapping("/{id}/unpause")
+	public GameDTO unpause(@PathVariable UUID id) {
+		return gameMapper.domainToApi(gameService.unpause(id));
+	}
 }

@@ -18,7 +18,7 @@ public class GameService {
 	}
 
 	/**
-	 *
+	 * Create a Game from scratch
 	 * @param grid
 	 * @return a new {@link Game}
 	 */
@@ -35,7 +35,7 @@ public class GameService {
 	}
 
 	/**
-	 *
+	 * Get an existent Game
 	 * @param id
 	 * @return an existing {@link Game}
 	 * @throws {@link NotFoundException} if there is not a game with the param id
@@ -44,6 +44,32 @@ public class GameService {
 		final Game game = gameRepository.get(id)
 				.orElseThrow(NotFoundException::new);
 		game.recalculateDuration();
+		return game;
+	}
+
+	/**
+	 * Pause an ongoing Game
+	 * @param id
+	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 */
+	public IGame pause(UUID id) {
+		final Game game = gameRepository.get(id)
+				.orElseThrow(NotFoundException::new);
+		game.pause();
+		gameRepository.save(game);
+		return game;
+	}
+
+	/**
+	 * Unpause a paused Game
+	 * @param id
+	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 */
+	public IGame unpause(UUID id) {
+		final Game game = gameRepository.get(id)
+				.orElseThrow(NotFoundException::new);
+		game.unpause();
+		gameRepository.save(game);
 		return game;
 	}
 }

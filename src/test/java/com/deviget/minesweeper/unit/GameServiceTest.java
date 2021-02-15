@@ -37,7 +37,7 @@ public class GameServiceTest {
 	}
 
 	@Test
-	public void whenCreateAGame_thenTheGameIsCorrectlyCreated() {
+	public void givenAGrid_whenCreateAGame_thenTheGameIsCorrectlyCreated() {
 		final IGame game = instance.create(grid);
 
 		assertNotNull(game.getId());
@@ -47,23 +47,23 @@ public class GameServiceTest {
 	}
 
 	@Test
-	public void whenCreateAGame_thenThereWasARepositoryProblem() {
+	public void givenAGrid_whenCreateAGame_thenThereIsARepositoryProblem() {
 		doThrow(RepositoryException.class).when(repository).save(any());
 
 		assertThrows(RepositoryException.class, () -> instance.create(grid));
 	}
 
 	@Test
-	public void whenGetAnExistentGame_thenTheGameIsAcquired() {
-		final IGame expected = instance.create(grid);
+	public void givenAnExistentGame_whenGetIt_thenTheGameIsFound() {
+		final IGame existent = instance.create(grid);
 
-		when(repository.get(expected.getId())).thenReturn(Optional.of((Game) expected));
+		when(repository.get(existent.getId())).thenReturn(Optional.of((Game) existent));
 
-		assertEquals(expected, instance.get(expected.getId()));
+		assertEquals(existent, instance.get(existent.getId()));
 	}
 
 	@Test
-	public void whenGetANonExistentGame_thenGameNotFound() {
+	public void givenANonExistentGame_whenGetIt_thenGameIsNotFound() {
 		final UUID gameId = UUID.randomUUID();
 
 		when(repository.get(gameId)).thenReturn(Optional.empty());
@@ -72,12 +72,57 @@ public class GameServiceTest {
 	}
 
 	@Test
-	public void whenGetAGame_thenThereWasARepositoryProblem() {
+	public void givenAnExistentGame_whenGetIt_thenThereIsARepositoryProblem() {
 		final UUID gameId = UUID.randomUUID();
 
 		when(repository.get(gameId)).thenThrow(RepositoryException.class);
 
 		assertThrows(RepositoryException.class, () -> instance.get(gameId));
+	}
+
+	@Test
+	public void givenAnOngoingGame_whenPauseIt_thenGameIsPaused() {
+		final IGame existent = instance.create(grid);
+
+		when(repository.get(existent.getId())).thenReturn(Optional.of((Game) existent));
+
+		final IGame paused = instance.pause(existent.getId());
+
+		assertEquals(GameStatus.PAUSED, paused.getStatus());
+	}
+
+	@Test
+	public void givenANonExistentGame_whenPauseIt_thenGameIsNotFound() {
+		final UUID gameId = UUID.randomUUID();
+
+		when(repository.get(gameId)).thenReturn(Optional.empty());
+
+		assertThrows(NotFoundException.class, () -> instance.pause(gameId));
+	}
+
+
+	@Test
+	public void givenAPausedGame_whenUnpauseIt_thenGameIsOngoing() {
+		final IGame existent = instance.create(grid);
+
+		when(repository.get(existent.getId())).thenReturn(Optional.of((Game) existent));
+
+		final IGame paused = instance.pause(existent.getId());
+
+		assertEquals(GameStatus.PAUSED, paused.getStatus());
+
+		final IGame unpaused = instance.unpause(existent.getId());
+
+		assertEquals(GameStatus.ONGOING, unpaused.getStatus());
+	}
+
+	@Test
+	public void givenANonExistentGame_whenUnpauseIt_thenGameIsNotFound() {
+		final UUID gameId = UUID.randomUUID();
+
+		when(repository.get(gameId)).thenReturn(Optional.empty());
+
+		assertThrows(NotFoundException.class, () -> instance.unpause(gameId));
 	}
 
 	private GameGrid getGrid() {

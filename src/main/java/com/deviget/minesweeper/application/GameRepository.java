@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface GameRepository {
 	/**
-	 * Save a Game.
+	 * Save or update a Game.
 	 * @param game
 	 * @throws {@link RepositoryException} if there is something wrong
 	 */
