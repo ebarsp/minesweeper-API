@@ -1,7 +1,7 @@
 package com.deviget.minesweeper.infrastructure.controllers;
 
 import com.deviget.minesweeper.domain.InvalidStateException;
-import com.deviget.minesweeper.domain.NotFoundException;
+import com.deviget.minesweeper.application.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

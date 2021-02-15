@@ -1,4 +1,4 @@
-package com.deviget.minesweeper.domain;
+package com.deviget.minesweeper.application;
 
 public class RepositoryException extends RuntimeException {
 

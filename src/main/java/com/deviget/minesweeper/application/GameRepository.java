@@ -1,7 +1,6 @@
 package com.deviget.minesweeper.application;
 
 import com.deviget.minesweeper.domain.Game;
-import com.deviget.minesweeper.domain.RepositoryException;
 
 import java.util.Optional;
 import java.util.UUID;

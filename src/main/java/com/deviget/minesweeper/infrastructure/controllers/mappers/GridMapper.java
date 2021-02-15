@@ -13,8 +13,8 @@ public class GridMapper {
 
 	public GameGrid apiToDomain(final GridDTO grid) {
 		return GameGrid.GridBuilder.aGrid()
-				.withX(grid.getX())
-				.withY(grid.getY())
+				.withWidth(grid.getWidth())
+				.withHeight(grid.getHeight())
 				.withMines(grid.getMines())
 				.build();
 	}

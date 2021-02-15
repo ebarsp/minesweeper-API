@@ -27,8 +27,8 @@ public class GameTest {
 	public void setUp() {
 		gameId = UUID.randomUUID();
 		grid = GameGrid.GridBuilder.aGrid()
-				.withX(1)
-				.withY(1)
+				.withWidth(1)
+				.withHeight(1)
 				.withMines(1)
 				.build();
 	}

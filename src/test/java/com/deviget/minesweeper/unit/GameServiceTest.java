@@ -6,8 +6,8 @@ import com.deviget.minesweeper.domain.Game;
 import com.deviget.minesweeper.domain.GameGrid;
 import com.deviget.minesweeper.domain.GameStatus;
 import com.deviget.minesweeper.domain.IGame;
-import com.deviget.minesweeper.domain.NotFoundException;
-import com.deviget.minesweeper.domain.RepositoryException;
+import com.deviget.minesweeper.application.NotFoundException;
+import com.deviget.minesweeper.application.RepositoryException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -127,8 +127,8 @@ public class GameServiceTest {
 
 	private GameGrid getGrid() {
 		return GameGrid.GridBuilder.aGrid()
-				.withX(10)
-				.withY(10)
+				.withWidth(10)
+				.withHeight(10)
 				.withMines(3)
 				.build();
 	}

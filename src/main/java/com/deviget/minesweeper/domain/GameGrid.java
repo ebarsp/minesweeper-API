@@ -1,22 +1,22 @@
 package com.deviget.minesweeper.domain;
 
 public class GameGrid {
-	private final Integer x;
-	private final Integer y;
+	private final Integer height;
+	private final Integer width;
 	private final Integer mines;
 
 	private GameGrid(GridBuilder builder) {
-		this.y = builder.y;
-		this.x = builder.x;
+		this.height = builder.height;
+		this.width = builder.width;
 		this.mines = builder.mines;
 	}
 
-	public Integer getX() {
-		return x;
+	public Integer getHeight() {
+		return height;
 	}
 
-	public Integer getY() {
-		return y;
+	public Integer getWidth() {
+		return width;
 	}
 
 	public Integer getMines() {
@@ -24,8 +24,8 @@ public class GameGrid {
 	}
 
 	public static final class GridBuilder {
-		private Integer x;
-		private Integer y;
+		private Integer height;
+		private Integer width;
 		private Integer mines;
 
 		private GridBuilder() {
@@ -35,13 +35,13 @@ public class GameGrid {
 			return new GridBuilder();
 		}
 
-		public GridBuilder withX(Integer x) {
-			this.x = x;
+		public GridBuilder withHeight(Integer height) {
+			this.height = height;
 			return this;
 		}
 
-		public GridBuilder withY(Integer y) {
-			this.y = y;
+		public GridBuilder withWidth(Integer width) {
+			this.width = width;
 			return this;
 		}
 
@@ -51,7 +51,7 @@ public class GameGrid {
 		}
 
 		public GameGrid build() {
-			if (x == null || y == null || mines == null) {
+			if (height == null || width == null || mines == null) {
 				throw new InvalidStateException("There are missed arguments");
 			}
 			return new GameGrid(this);

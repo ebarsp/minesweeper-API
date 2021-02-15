@@ -4,7 +4,6 @@ import com.deviget.minesweeper.domain.Game;
 import com.deviget.minesweeper.domain.GameGrid;
 import com.deviget.minesweeper.domain.GameStatus;
 import com.deviget.minesweeper.domain.IGame;
-import com.deviget.minesweeper.domain.NotFoundException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

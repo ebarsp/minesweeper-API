@@ -26,7 +26,7 @@ public class GameAPITest {
 
 	@Test
 	public void givenAGrid_whenCreateAGame_thenReturnANewGame() throws Exception {
-		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
+		final String json = "{ \"width\": 3, \"height\": 3, \"mines\": 1 }";
 		mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("game_id", notNullValue()))
@@ -42,7 +42,7 @@ public class GameAPITest {
 
 	@Test
 	public void givenAGame_whenGetIt_thenReturnTheOnGoingGame() throws Exception {
-		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
+		final String json = "{ \"width\": 3, \"height\": 3, \"mines\": 1 }";
 		final MvcResult result = mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("game_id", notNullValue()))
@@ -66,7 +66,7 @@ public class GameAPITest {
 
 	@Test
 	public void givenAnOngoingGame_whenPauseIt_thenGameIsPaused() throws Exception {
-		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
+		final String json = "{ \"width\": 3, \"height\": 3, \"mines\": 1 }";
 		final MvcResult result = mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("game_id", notNullValue()))
@@ -84,7 +84,7 @@ public class GameAPITest {
 
 	@Test
 	public void givenAPausedGame_whenUnpauseIt_thenGameIsOngoing() throws Exception {
-		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
+		final String json = "{ \"width\": 3, \"height\": 3, \"mines\": 1 }";
 		final MvcResult result = mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("game_id", notNullValue()))
