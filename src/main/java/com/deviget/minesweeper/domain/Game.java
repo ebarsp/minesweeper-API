@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class Game {
+public class Game implements IGame {
 	private final UUID id;
 	private final GameGrid grid;
 	private final GameStatus status;
@@ -19,18 +19,22 @@ public class Game {
 		this.lastUpdateTime = builder.lastUpdateTime;
 	}
 
+	@Override
 	public UUID getId() {
 		return id;
 	}
 
+	@Override
 	public GameGrid getGrid() {
 		return grid;
 	}
 
+	@Override
 	public GameStatus getStatus() {
 		return status;
 	}
 
+	@Override
 	public String getDurationString() {
 		return String.format("%d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
 	}

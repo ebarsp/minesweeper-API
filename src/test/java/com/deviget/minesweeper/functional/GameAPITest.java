@@ -1,6 +1,6 @@
 package com.deviget.minesweeper.functional;
 
-import com.deviget.minesweeper.infrastructure.controllers.MinesweeperController;
+import com.deviget.minesweeper.infrastructure.controllers.GameController;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +19,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(MinesweeperController.class)
-public class MinesweeperAPITest {
+@WebMvcTest(GameController.class)
+public class GameAPITest {
 	@Autowired
 	private MockMvc mvc;
 
 	@Test
 	public void whenCreateAGame_thenReturnANewGame() throws Exception {
 		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
-		mvc.perform(post("/v0/minesweeper").contentType(MediaType.APPLICATION_JSON).content(json))
+		mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("game_id", notNullValue()))
 				.andExpect(jsonPath("status", is("ONGOING")))
@@ -36,14 +36,14 @@ public class MinesweeperAPITest {
 
 	@Test
 	public void whenCreateAGameWithoutArguments_thenBadRequest() throws Exception {
-		mvc.perform(post("/v0/minesweeper").contentType(MediaType.APPLICATION_JSON).content("{}"))
+		mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content("{}"))
 				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void whenGetACreatedGame_thenReturnTheOnGoingGame() throws Exception {
 		final String json = "{ \"grid_x\": 3, \"grid_y\": 3, \"mines\": 1 }";
-		final MvcResult result = mvc.perform(post("/v0/minesweeper").contentType(MediaType.APPLICATION_JSON).content(json))
+		final MvcResult result = mvc.perform(post("/v0/games").contentType(MediaType.APPLICATION_JSON).content(json))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("game_id", notNullValue()))
 				.andReturn();
@@ -51,7 +51,7 @@ public class MinesweeperAPITest {
 		TimeUnit.SECONDS.sleep(2);
 
 		String gameId = JsonPath.read(result.getResponse().getContentAsString(), "$.game_id");
-		mvc.perform(get("/v0/minesweeper/" + gameId).contentType(MediaType.APPLICATION_JSON))
+		mvc.perform(get("/v0/games/" + gameId).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("game_id", is(gameId)))
 				.andExpect(jsonPath("status", is("ONGOING")))
@@ -60,7 +60,7 @@ public class MinesweeperAPITest {
 
 	@Test
 	public void whenGetANonExistentGame_thenNotFound() throws Exception {
-		mvc.perform(get("/v0/minesweeper/" + UUID.randomUUID().toString()).contentType(MediaType.APPLICATION_JSON))
+		mvc.perform(get("/v0/games/" + UUID.randomUUID().toString()).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
 }

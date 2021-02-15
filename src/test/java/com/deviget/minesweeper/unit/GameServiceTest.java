@@ -1,21 +1,22 @@
 package com.deviget.minesweeper.unit;
 
 import com.deviget.minesweeper.application.GameRepository;
-import com.deviget.minesweeper.application.MinesweeperService;
+import com.deviget.minesweeper.application.GameService;
 import com.deviget.minesweeper.domain.Game;
 import com.deviget.minesweeper.domain.GameGrid;
 import com.deviget.minesweeper.domain.GameStatus;
+import com.deviget.minesweeper.domain.IGame;
 import com.deviget.minesweeper.domain.NotFoundException;
 import com.deviget.minesweeper.domain.RepositoryException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -23,21 +24,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class MinesweeperServiceTest {
-	private MinesweeperService instance;
+public class GameServiceTest {
+	private GameService instance;
 	private GameRepository repository;
 	private GameGrid grid;
 
 	@BeforeEach
 	public void setUp() {
 		repository = mock(GameRepository.class);
-		instance = new MinesweeperService(repository);
+		instance = new GameService(repository);
 		grid = getGrid();
 	}
 
 	@Test
 	public void whenCreateAGame_thenTheGameIsCorrectlyCreated() {
-		final Game game = instance.create(grid);
+		final IGame game = instance.create(grid);
 
 		assertNotNull(game.getId());
 		assertEquals(grid, game.getGrid());
@@ -54,18 +55,18 @@ public class MinesweeperServiceTest {
 
 	@Test
 	public void whenGetAnExistentGame_thenTheGameIsAcquired() {
-		final Game expected = instance.create(grid);
+		final IGame expected = instance.create(grid);
 
-		when(repository.get(expected.getId())).thenReturn(expected);
+		when(repository.get(expected.getId())).thenReturn(Optional.of((Game) expected));
 
-		assertSame(expected, instance.get(expected.getId()));
+		assertEquals(expected, instance.get(expected.getId()));
 	}
 
 	@Test
 	public void whenGetANonExistentGame_thenGameNotFound() {
 		final UUID gameId = UUID.randomUUID();
 
-		when(repository.get(gameId)).thenThrow(NotFoundException.class);
+		when(repository.get(gameId)).thenReturn(Optional.empty());
 
 		assertThrows(NotFoundException.class, () -> instance.get(gameId));
 	}

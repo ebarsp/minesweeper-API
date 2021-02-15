@@ -3,15 +3,17 @@ package com.deviget.minesweeper.application;
 import com.deviget.minesweeper.domain.Game;
 import com.deviget.minesweeper.domain.GameGrid;
 import com.deviget.minesweeper.domain.GameStatus;
+import com.deviget.minesweeper.domain.IGame;
+import com.deviget.minesweeper.domain.NotFoundException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class MinesweeperService {
+public class GameService {
 	private final GameRepository gameRepository;
 
-	public MinesweeperService(GameRepository gameRepository) {
+	public GameService(GameRepository gameRepository) {
 		this.gameRepository = gameRepository;
 	}
 
@@ -20,7 +22,7 @@ public class MinesweeperService {
 	 * @param grid
 	 * @return a new {@link Game}
 	 */
-	public Game create(GameGrid grid) {
+	public IGame create(GameGrid grid) {
 		final Game game = Game.GameBuilder.aGame()
 				.withId(UUID.randomUUID())
 				.withStatus(GameStatus.ONGOING)
@@ -36,9 +38,11 @@ public class MinesweeperService {
 	 *
 	 * @param id
 	 * @return an existing {@link Game}
+	 * @throws {@link NotFoundException} if there is not a game with the param id
 	 */
-	public Game get(UUID id) {
-		final Game game = gameRepository.get(id);
+	public IGame get(UUID id) {
+		final Game game = gameRepository.get(id)
+				.orElseThrow(NotFoundException::new);
 		game.recalculateDuration();
 		return game;
 	}

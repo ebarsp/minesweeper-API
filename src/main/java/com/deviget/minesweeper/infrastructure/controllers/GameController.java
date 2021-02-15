@@ -1,10 +1,10 @@
 package com.deviget.minesweeper.infrastructure.controllers;
 
-import com.deviget.minesweeper.domain.Game;
+import com.deviget.minesweeper.domain.IGame;
 import com.deviget.minesweeper.infrastructure.controllers.dtos.GameDTO;
 import com.deviget.minesweeper.infrastructure.controllers.dtos.GridDTO;
 import com.deviget.minesweeper.infrastructure.controllers.mappers.GameMapper;
-import com.deviget.minesweeper.application.MinesweeperService;
+import com.deviget.minesweeper.application.GameService;
 import com.deviget.minesweeper.infrastructure.controllers.mappers.GridMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v0/minesweeper")
-public class MinesweeperController {
-	private final MinesweeperService minesweeperService;
+@RequestMapping("/v0/games")
+public class GameController {
+	private final GameService gameService;
 	private final GameMapper gameMapper;
 	private final GridMapper gridMapper;
 
-	public MinesweeperController(MinesweeperService minesweeperService, GameMapper gameMapper, GridMapper gridMapper) {
-		this.minesweeperService = minesweeperService;
+	public GameController(GameService gameService, GameMapper gameMapper, GridMapper gridMapper) {
+		this.gameService = gameService;
 		this.gameMapper = gameMapper;
 		this.gridMapper = gridMapper;
 	}
@@ -33,12 +33,12 @@ public class MinesweeperController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public GameDTO create(@RequestBody GridDTO grid) {
-		final Game game = minesweeperService.create(gridMapper.apiToDomain(grid));
+		final IGame game = gameService.create(gridMapper.apiToDomain(grid));
 		return gameMapper.domainToApi(game);
 	}
 
 	@GetMapping("/{id}")
 	public GameDTO get(@PathVariable UUID id) {
-		return gameMapper.domainToApi(minesweeperService.get(id));
+		return gameMapper.domainToApi(gameService.get(id));
 	}
 }
