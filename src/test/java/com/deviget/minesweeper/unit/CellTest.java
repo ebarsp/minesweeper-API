@@ -101,7 +101,7 @@ public class CellTest {
 	}
 
 	@Test
-	public void givenAMineCell_whenUncoverIt_thenGameIsOver() {
+	public void givenAMinedCell_whenUncoverIt_thenGameIsOver() {
 		Cell cell = new Cell(new CellPosition(1, 2), CellValue.MINE, CellStatus.COVERED);
 
 		assertThrows(GameOverException.class, cell::uncover);

@@ -2,6 +2,7 @@ package com.deviget.minesweeper.infrastructure.controllers.mappers;
 
 import com.deviget.minesweeper.domain.IGame;
 import com.deviget.minesweeper.infrastructure.controllers.dtos.GameDTO;
+import com.deviget.minesweeper.infrastructure.controllers.dtos.GridResponseDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,11 +14,7 @@ public class GameMapper {
 	}
 
 	public GameDTO domainToApi(IGame game) {
-		return GameDTO.Builder.aGameDTO()
-				.withId(game.getId())
-				.withStatus(game.getStatus())
-				.withDuration(game.getDurationString())
-				.withGrid(gridMapper.domainToApi(game.getGrid()))
-				.build();
+		final GridResponseDTO grid = gridMapper.domainToApi(game.getGrid());
+		return new GameDTO(game.getId(), game.getStatus(), game.getDurationString(), grid);
 	}
 }

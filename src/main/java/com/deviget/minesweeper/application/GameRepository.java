@@ -8,16 +8,16 @@ import java.util.UUID;
 public interface GameRepository {
 	/**
 	 * Save or update a Game.
-	 * @param game
-	 * @throws {@link RepositoryException} if there is something wrong
+	 * @param game {@link Game}
+	 * @throws RepositoryException if there is something wrong
 	 */
 	void save(Game game);
 
 	/**
 	 * Get a Game by Id.
-	 * @param id
+	 * @param id {@link UUID}
 	 * @return an existing {@link Game}
-	 * @throws {@link RepositoryException} if there is something wrong
+	 * @throws RepositoryException if there is something wrong
 	 */
 	Optional<Game> get(UUID id);
 }

@@ -19,26 +19,20 @@ public class GameService {
 
 	/**
 	 * Create a Game from scratch
-	 * @param grid
+	 * @param grid {@link GameGrid}
 	 * @return a new {@link Game}
 	 */
 	public IGame create(GameGrid grid) {
-		final Game game = Game.GameBuilder.aGame()
-				.withId(UUID.randomUUID())
-				.withStatus(GameStatus.ONGOING)
-				.withDuration(Duration.ZERO)
-				.withLastUpdateTime(LocalDateTime.now())
-				.withGrid(grid)
-				.build();
+		final Game game = new Game(UUID.randomUUID(), grid, GameStatus.ONGOING, Duration.ZERO, LocalDateTime.now());
 		gameRepository.save(game);
 		return game;
 	}
 
 	/**
 	 * Get an existent Game
-	 * @param id
+	 * @param id {@link UUID}
 	 * @return an existing {@link Game}
-	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 * @throws NotFoundException if there is not a game with the param id
 	 */
 	public IGame get(UUID id) {
 		final Game game = gameRepository.get(id)
@@ -49,9 +43,9 @@ public class GameService {
 
 	/**
 	 * Pause an ongoing Game
-	 * @param id
+	 * @param id {@link UUID}
 	 * @return the paused {@link Game}
-	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 * @throws NotFoundException if there is not a game with the param id
 	 */
 	public IGame pause(UUID id) {
 		final Game game = gameRepository.get(id)
@@ -63,9 +57,9 @@ public class GameService {
 
 	/**
 	 * Unpause a paused Game
-	 * @param id
+	 * @param id {@link UUID}
 	 * @return the ongoing {@link Game}
-	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 * @throws NotFoundException if there is not a game with the param id
 	 */
 	public IGame unpause(UUID id) {
 		final Game game = gameRepository.get(id)
@@ -77,10 +71,10 @@ public class GameService {
 
 	/**
 	 * Uncover a Game's cell indicated by a position
-	 * @param id
-	 * @param position
+	 * @param id {@link UUID}
+	 * @param position {@link CellPosition}
 	 * @return the current {@link Game}
-	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 * @throws NotFoundException if there is not a game with the param id
 	 */
 	public IGame uncoverACell(UUID id, CellPosition position) {
 		final Game game = gameRepository.get(id)
@@ -92,10 +86,10 @@ public class GameService {
 
 	/**
 	 * Mark a Game's cell indicated by a position
-	 * @param id
-	 * @param position
+	 * @param id {@link UUID}
+	 * @param position {@link CellPosition}
 	 * @return the ongoing {@link Game}
-	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 * @throws NotFoundException if there is not a game with the param id
 	 */
 	public IGame markACell(UUID id, CellPosition position) {
 		final Game game = gameRepository.get(id)
@@ -107,10 +101,10 @@ public class GameService {
 
 	/**
 	 * Unmark a marked Game's cell indicated by position
-	 * @param id
-	 * @param position
+	 * @param id {@link UUID}
+	 * @param position {@link CellPosition}
 	 * @return the ongoing {@link Game}
-	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 * @throws NotFoundException if there is not a game with the param id
 	 */
 	public IGame unmarkACell(UUID id, CellPosition position) {
 		final Game game = gameRepository.get(id)
@@ -122,10 +116,10 @@ public class GameService {
 
 	/**
 	 * Flag a Game's cell indicated by a position
-	 * @param id
-	 * @param position
+	 * @param id {@link UUID}
+	 * @param position {@link CellPosition}
 	 * @return the ongoing {@link Game}
-	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 * @throws NotFoundException if there is not a game with the param id
 	 */
 	public IGame flagACell(UUID id, CellPosition position) {
 		final Game game = gameRepository.get(id)
@@ -137,10 +131,10 @@ public class GameService {
 
 	/**
 	 * Unflag a flagged Game's cell indicated by position
-	 * @param id
-	 * @param position
+	 * @param id {@link UUID}
+	 * @param position {@link CellPosition}
 	 * @return the ongoing {@link Game}
-	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 * @throws NotFoundException if there is not a game with the param id
 	 */
 	public IGame unflagACell(UUID id, CellPosition position) {
 		final Game game = gameRepository.get(id)

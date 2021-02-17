@@ -5,36 +5,43 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class GameGrid implements IGameGrid {
-	private final Integer height;
+	private static final int MIN_VALUE = 1;
+
 	private final Integer width;
+	private final Integer height;
 	private final Integer mines;
 	private final Map<CellPosition, Cell> cells;
 	private final Set<CellPosition> visited;
 
-	private GameGrid(GridBuilder builder) {
-		height = builder.height;
-		width = builder.width;
-		mines = builder.mines;
-		cells = Objects.isNull(builder.cells)
-				? getGridCells(builder.height, builder.width, builder.mines) : builder.cells;
-		visited = Objects.isNull(builder.visited) ? new HashSet<>() : builder.visited;
+	GameGrid(Integer width, Integer height, Integer mines, Map<CellPosition, Cell> cells, Set<CellPosition> visited) {
+		if (height == null || width == null || mines == null || cells == null || visited == null) {
+			throw new InvalidStateException("There are missed arguments");
+		}
+		this.width = width;
+		this.height = height;
+		this.mines = mines;
+		this.cells = cells;
+		this.visited = visited;
 	}
 
-	@Override
-	public Integer getHeight() {
-		return height;
+	public GameGrid(Integer width, Integer height, Integer mines) {
+		this(width, height, mines, getGridCells(height, width, mines), new HashSet<>());
 	}
 
 	@Override
 	public Integer getWidth() {
 		return width;
+	}
+
+	@Override
+	public Integer getHeight() {
+		return height;
 	}
 
 	@Override
@@ -77,7 +84,6 @@ public class GameGrid implements IGameGrid {
 					.filter(cells::containsKey)
 					.filter(p -> !visited.contains(p))
 					.map(cells::get)
-					.filter(c -> !c.isAMine())
 					.map(Cell::getPosition)
 					.forEach(this::uncoverACell);
 		}
@@ -97,7 +103,16 @@ public class GameGrid implements IGameGrid {
 		}
 	}
 
-	private Map<CellPosition, Cell> getGridCells(Integer height, Integer width, Integer mines) {
+	private static Map<CellPosition, Cell> getGridCells(Integer height, Integer width, Integer mines) {
+		if (height == null || width == null || mines == null) {
+			throw new InvalidStateException("There are missed arguments");
+		}
+		if (height < MIN_VALUE || width < MIN_VALUE || mines < MIN_VALUE) {
+			throw new InvalidStateException("Both grid's dimensions and mines should be higher than zero");
+		}
+		if (mines > height * width) {
+			throw new InvalidStateException("Mines shouldn't be higher than grid's dimensions");
+		}
 		Map<CellPosition, Cell> cells = new HashMap<>();
 		// List all grid's positions
 		List<CellPosition> positions = getAllPositions(height, width);
@@ -153,58 +168,5 @@ public class GameGrid implements IGameGrid {
 			minedPositions.add(position);
 		}
 		return minedPositions;
-	}
-
-	public static final class GridBuilder {
-		private Map<CellPosition, Cell> cells;
-		private Set<CellPosition> visited;
-		private Integer height;
-		private Integer width;
-		private Integer mines;
-
-		private GridBuilder() {
-		}
-
-		public static GridBuilder aGrid() {
-			return new GridBuilder();
-		}
-
-		public GridBuilder withCells(Map<CellPosition, Cell> cells) {
-			this.cells = cells;
-			return this;
-		}
-
-		public GridBuilder withVisited(Set<CellPosition> visited) {
-			this.visited = visited;
-			return this;
-		}
-
-		public GridBuilder withHeight(Integer height) {
-			this.height = height;
-			return this;
-		}
-
-		public GridBuilder withWidth(Integer width) {
-			this.width = width;
-			return this;
-		}
-
-		public GridBuilder withMines(Integer mines) {
-			this.mines = mines;
-			return this;
-		}
-
-		public GameGrid build() {
-			if (height == null || width == null || mines == null) {
-				throw new InvalidStateException("There are missed arguments");
-			}
-			if (height < 1 || width < 1 || mines < 1) {
-				throw new InvalidStateException("Both grid's dimensions and mines should be higher than zero");
-			}
-			if (mines > height * width) {
-				throw new InvalidStateException("Mines shouldn't be higher than grid's dimensions");
-			}
-			return new GameGrid(this);
-		}
 	}
 }

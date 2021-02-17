@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -27,38 +26,22 @@ public class GameTest {
 	@BeforeEach
 	public void setUp() {
 		gameId = UUID.randomUUID();
-		grid = getGrid();
+		grid = new GameGrid(1, 1, 1);
 	}
 
 	@Test
-	public void givenAnIncompleteGame_whenItsBuilt_thenCannotCreateAGameWithInvalidState() {
-		Game.GameBuilder builder = Game.GameBuilder.aGame()
-				.withId(gameId);
-
-		assertThrows(InvalidStateException.class, builder::build);
-
-		builder.withDuration(Duration.ZERO);
-		assertThrows(InvalidStateException.class, builder::build);
-
-		builder.withStatus(GameStatus.ONGOING);
-		assertThrows(InvalidStateException.class, builder::build);
-
-		builder.withLastUpdateTime(LocalDateTime.MIN);
-		assertThrows(InvalidStateException.class, builder::build);
-
-		builder.withId(null).withGrid(grid);
-		assertThrows(InvalidStateException.class, builder::build);
+	public void givenAnIncompleteGame_whenItsInstanced_thenCannotCreateAGameWithInvalidState() {
+		assertThrows(InvalidStateException.class, () -> new Game(null, null, null, null, null));
+		assertThrows(InvalidStateException.class, () -> new Game(null, grid, GameStatus.ONGOING, Duration.ZERO, LocalDateTime.MIN));
+		assertThrows(InvalidStateException.class, () -> new Game(UUID.randomUUID(), null, GameStatus.ONGOING, Duration.ZERO, LocalDateTime.MIN));
+		assertThrows(InvalidStateException.class, () -> new Game(UUID.randomUUID(), grid, null, Duration.ZERO, LocalDateTime.MIN));
+		assertThrows(InvalidStateException.class, () -> new Game(UUID.randomUUID(), grid, GameStatus.ONGOING, null, LocalDateTime.MIN));
+		assertThrows(InvalidStateException.class, () -> new Game(UUID.randomUUID(), grid, GameStatus.ONGOING, Duration.ZERO, null));
 	}
 
 	@Test
 	public void givenAnGameStartedGame_whenRecalculateDurationAfterTwoSeconds_thenBothDurationAndLastUpdateAreChanged() throws InterruptedException {
-		Game game = Game.GameBuilder.aGame()
-				.withId(gameId)
-				.withStatus(GameStatus.ONGOING)
-				.withDuration(Duration.ZERO)
-				.withLastUpdateTime(LocalDateTime.now())
-				.withGrid(grid)
-				.build();
+		Game game = new Game(gameId, grid, GameStatus.ONGOING, Duration.ZERO, LocalDateTime.now());
 
 		LocalDateTime original = game.getLastUpdateTime();
 
@@ -71,13 +54,7 @@ public class GameTest {
 
 	@Test
 	public void givenAnOngoingGame_whenTryPausedItAfterTwoSeconds_thenBothGameStatusAndDurationAreChanged() throws InterruptedException, InvalidActionException {
-		Game game = Game.GameBuilder.aGame()
-				.withId(gameId)
-				.withStatus(GameStatus.ONGOING)
-				.withDuration(Duration.ZERO)
-				.withLastUpdateTime(LocalDateTime.now())
-				.withGrid(grid)
-				.build();
+		Game game = new Game(gameId, grid, GameStatus.ONGOING, Duration.ZERO, LocalDateTime.now());
 
 		TimeUnit.SECONDS.sleep(2);
 		game.pause();
@@ -88,40 +65,24 @@ public class GameTest {
 
 	@Test
 	public void givenAPausedGame_whenTryPauseIt_thenItsAnInvalidAction() {
-		Game game = Game.GameBuilder.aGame()
-				.withId(gameId)
-				.withStatus(GameStatus.PAUSED)
-				.withDuration(Duration.ZERO)
-				.withLastUpdateTime(LocalDateTime.now())
-				.withGrid(grid)
-				.build();
+		Game game = new Game(gameId, grid, GameStatus.PAUSED, Duration.ZERO, LocalDateTime.now());
+
 		assertThrows(InvalidActionException.class, game::pause);
 	}
 
 	@Test
 	public void givenAGameOver_whenTryPauseIt_thenItsAnInvalidAction() {
-		Game game = Game.GameBuilder.aGame()
-				.withId(gameId)
-				.withStatus(GameStatus.LOST)
-				.withDuration(Duration.ZERO)
-				.withLastUpdateTime(LocalDateTime.now())
-				.withGrid(grid)
-				.build();
+		Game game = new Game(gameId, grid, GameStatus.LOST, Duration.ZERO, LocalDateTime.now());
+
 		assertThrows(InvalidActionException.class, game::pause);
 	}
 
 	@Test
-	public void givenAPausedGame_whenTryUnpauseIt_thenBothGameStatusAndLastUpdateAreChanged() throws InvalidActionException {
-		Game game = Game.GameBuilder.aGame()
-				.withId(gameId)
-				.withStatus(GameStatus.PAUSED)
-				.withDuration(Duration.ZERO)
-				.withLastUpdateTime(LocalDateTime.now())
-				.withGrid(grid)
-				.build();
-
+	public void givenAPausedGame_whenUnpauseIt_thenBothGameStatusAndLastUpdateAreChanged() throws InvalidActionException, InterruptedException {
+		Game game = new Game(gameId, grid, GameStatus.PAUSED, Duration.ZERO, LocalDateTime.now());
 		LocalDateTime original = game.getLastUpdateTime();
 
+		TimeUnit.MILLISECONDS.sleep(1);
 		game.unpause();
 
 		assertEquals(GameStatus.ONGOING, game.getStatus());
@@ -130,34 +91,15 @@ public class GameTest {
 
 	@Test
 	public void givenAnOngoingGame_whenTryUnpauseIt_thenItsAnInvalidAction() {
-		Game game = Game.GameBuilder.aGame()
-				.withId(gameId)
-				.withStatus(GameStatus.ONGOING)
-				.withDuration(Duration.ZERO)
-				.withLastUpdateTime(LocalDateTime.now())
-				.withGrid(grid)
-				.build();
+		Game game = new Game(gameId, grid, GameStatus.ONGOING, Duration.ZERO, LocalDateTime.now());
+
 		assertThrows(InvalidActionException.class, game::unpause);
 	}
 
 	@Test
 	public void givenAGameOver_whenTryUnpauseIt_thenItsAnInvalidAction() {
-		Game game = Game.GameBuilder.aGame()
-				.withId(gameId)
-				.withStatus(GameStatus.LOST)
-				.withDuration(Duration.ZERO)
-				.withLastUpdateTime(LocalDateTime.now())
-				.withGrid(grid)
-				.build();
-		assertThrows(InvalidActionException.class, game::unpause);
-	}
+		Game game = new Game(gameId, grid, GameStatus.LOST, Duration.ZERO, LocalDateTime.now());
 
-	private GameGrid getGrid() {
-		return GameGrid.GridBuilder.aGrid()
-				.withWidth(1)
-				.withHeight(1)
-				.withMines(1)
-				.withCells(Map.of())
-				.build();
+		assertThrows(InvalidActionException.class, game::unpause);
 	}
 }

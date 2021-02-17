@@ -2,18 +2,17 @@ package com.deviget.minesweeper.unit;
 
 import com.deviget.minesweeper.application.GameRepository;
 import com.deviget.minesweeper.application.GameService;
+import com.deviget.minesweeper.application.NotFoundException;
+import com.deviget.minesweeper.application.RepositoryException;
 import com.deviget.minesweeper.domain.Game;
 import com.deviget.minesweeper.domain.GameGrid;
 import com.deviget.minesweeper.domain.GameStatus;
 import com.deviget.minesweeper.domain.IGame;
-import com.deviget.minesweeper.application.NotFoundException;
-import com.deviget.minesweeper.application.RepositoryException;
 import com.deviget.minesweeper.domain.InvalidActionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,7 +34,7 @@ public class GameServiceTest {
 	public void setUp() {
 		repository = mock(GameRepository.class);
 		instance = new GameService(repository);
-		grid = getGrid();
+		grid = new GameGrid(10, 10, 3);
 	}
 
 	@Test
@@ -125,14 +124,5 @@ public class GameServiceTest {
 		when(repository.get(gameId)).thenReturn(Optional.empty());
 
 		assertThrows(NotFoundException.class, () -> instance.unpause(gameId));
-	}
-
-	private GameGrid getGrid() {
-		return GameGrid.GridBuilder.aGrid()
-				.withCells(Map.of())
-				.withWidth(10)
-				.withHeight(10)
-				.withMines(3)
-				.build();
 	}
 }

@@ -71,7 +71,7 @@ public class Cell implements ICell {
 		return CellValue.EMPTY.equals(value);
 	}
 
-	public boolean isAMine() {
+	private boolean isAMine() {
 		return CellValue.MINE.equals(value);
 	}
 
