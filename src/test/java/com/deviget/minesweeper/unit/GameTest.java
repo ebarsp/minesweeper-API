@@ -40,20 +40,7 @@ public class GameTest {
 	}
 
 	@Test
-	public void givenAnGameStartedGame_whenRecalculateDurationAfterTwoSeconds_thenBothDurationAndLastUpdateAreChanged() throws InterruptedException {
-		Game game = new Game(gameId, grid, GameStatus.ONGOING, Duration.ZERO, LocalDateTime.now());
-
-		LocalDateTime original = game.getLastUpdateTime();
-
-		TimeUnit.SECONDS.sleep(2);
-		game.recalculateDuration();
-
-		assertEquals("0:00:02", game.getDurationString());
-		assertNotEquals(original, game.getLastUpdateTime());
-	}
-
-	@Test
-	public void givenAnOngoingGame_whenTryPausedItAfterTwoSeconds_thenBothGameStatusAndDurationAreChanged() throws InterruptedException, InvalidActionException {
+	public void givenAnOngoingGame_whenPausedItAfterTwoSeconds_thenBothGameStatusAndDurationAreChanged() throws InterruptedException, InvalidActionException {
 		Game game = new Game(gameId, grid, GameStatus.ONGOING, Duration.ZERO, LocalDateTime.now());
 
 		TimeUnit.SECONDS.sleep(2);
@@ -101,5 +88,21 @@ public class GameTest {
 		Game game = new Game(gameId, grid, GameStatus.LOST, Duration.ZERO, LocalDateTime.now());
 
 		assertThrows(InvalidActionException.class, game::unpause);
+	}
+
+	@Test
+	public void givenAnOngoingGame_whenPausedItResumeItAndGettingDuration_thenDurationIsCorrect() throws InterruptedException, InvalidActionException {
+		Game game = new Game(gameId, grid, GameStatus.ONGOING, Duration.ZERO, LocalDateTime.now());
+
+		TimeUnit.SECONDS.sleep(2);
+		game.pause();
+
+		TimeUnit.SECONDS.sleep(2);
+		game.unpause();
+
+		TimeUnit.SECONDS.sleep(3);
+
+		assertEquals(GameStatus.ONGOING, game.getStatus());
+		assertEquals("0:00:05", game.getDurationString());
 	}
 }

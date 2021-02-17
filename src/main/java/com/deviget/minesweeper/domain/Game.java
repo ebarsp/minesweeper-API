@@ -39,6 +39,7 @@ public class Game implements IGame {
 
 	@Override
 	public String getDurationString() {
+		updateDuration();
 		return String.format("%d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
 	}
 
@@ -46,17 +47,16 @@ public class Game implements IGame {
 		return lastUpdateTime;
 	}
 
-	public void recalculateDuration() {
+	private void updateDuration() {
 		if (isOngoing()) {
-			final LocalDateTime now = LocalDateTime.now();
-			this.duration = Duration.between(lastUpdateTime, now);
-			this.lastUpdateTime = now;
+			this.duration = duration.plus(Duration.between(lastUpdateTime, LocalDateTime.now()));
 		}
 	}
 
 	public void pause() {
 		validateGame();
-		recalculateDuration();
+		updateDuration();
+		this.lastUpdateTime = LocalDateTime.now();
 		this.status = GameStatus.PAUSED;
 	}
 
@@ -95,7 +95,7 @@ public class Game implements IGame {
 		} catch (GameOverException e) {
 			status = e.getStatus();
 		}
-		recalculateDuration();
+		updateDuration();
 	}
 
 	private void validateGame() {

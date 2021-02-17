@@ -37,7 +37,6 @@ public class GameService {
 	public IGame get(UUID id) {
 		final Game game = gameRepository.get(id)
 				.orElseThrow(NotFoundException::new);
-		game.recalculateDuration();
 		return game;
 	}
 
