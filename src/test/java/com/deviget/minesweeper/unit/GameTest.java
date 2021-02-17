@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -26,11 +27,7 @@ public class GameTest {
 	@BeforeEach
 	public void setUp() {
 		gameId = UUID.randomUUID();
-		grid = GameGrid.GridBuilder.aGrid()
-				.withWidth(1)
-				.withHeight(1)
-				.withMines(1)
-				.build();
+		grid = getGrid();
 	}
 
 	@Test
@@ -73,7 +70,7 @@ public class GameTest {
 	}
 
 	@Test
-	public void givenAnOngoingGame_whenTryPausedItAfterTwoSeconds_thenBothGameStatusAndDurationAreChanged() throws InterruptedException {
+	public void givenAnOngoingGame_whenTryPausedItAfterTwoSeconds_thenBothGameStatusAndDurationAreChanged() throws InterruptedException, InvalidActionException {
 		Game game = Game.GameBuilder.aGame()
 				.withId(gameId)
 				.withStatus(GameStatus.ONGOING)
@@ -105,7 +102,7 @@ public class GameTest {
 	public void givenAGameOver_whenTryPauseIt_thenItsAnInvalidAction() {
 		Game game = Game.GameBuilder.aGame()
 				.withId(gameId)
-				.withStatus(GameStatus.ENDED)
+				.withStatus(GameStatus.LOST)
 				.withDuration(Duration.ZERO)
 				.withLastUpdateTime(LocalDateTime.now())
 				.withGrid(grid)
@@ -114,7 +111,7 @@ public class GameTest {
 	}
 
 	@Test
-	public void givenAPausedGame_whenTryUnpauseIt_thenBothGameStatusAndLastUpdateAreChanged() {
+	public void givenAPausedGame_whenTryUnpauseIt_thenBothGameStatusAndLastUpdateAreChanged() throws InvalidActionException {
 		Game game = Game.GameBuilder.aGame()
 				.withId(gameId)
 				.withStatus(GameStatus.PAUSED)
@@ -147,11 +144,20 @@ public class GameTest {
 	public void givenAGameOver_whenTryUnpauseIt_thenItsAnInvalidAction() {
 		Game game = Game.GameBuilder.aGame()
 				.withId(gameId)
-				.withStatus(GameStatus.ENDED)
+				.withStatus(GameStatus.LOST)
 				.withDuration(Duration.ZERO)
 				.withLastUpdateTime(LocalDateTime.now())
 				.withGrid(grid)
 				.build();
 		assertThrows(InvalidActionException.class, game::unpause);
+	}
+
+	private GameGrid getGrid() {
+		return GameGrid.GridBuilder.aGrid()
+				.withWidth(1)
+				.withHeight(1)
+				.withMines(1)
+				.withCells(Map.of())
+				.build();
 	}
 }

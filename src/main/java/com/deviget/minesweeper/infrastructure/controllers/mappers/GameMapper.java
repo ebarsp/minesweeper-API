@@ -13,7 +13,7 @@ public class GameMapper {
 	}
 
 	public GameDTO domainToApi(IGame game) {
-		return GameDTO.GameDTOBuilder.aGameDTO()
+		return GameDTO.Builder.aGameDTO()
 				.withId(game.getId())
 				.withStatus(game.getStatus())
 				.withDuration(game.getDurationString())

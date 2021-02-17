@@ -52,9 +52,7 @@ public class Game implements IGame {
 	}
 
 	public void pause() {
-		if (isGameOver() || isPaused()) {
-			throw new InvalidActionException();
-		}
+		validateGame();
 		recalculateDuration();
 		this.status = GameStatus.PAUSED;
 	}
@@ -67,6 +65,42 @@ public class Game implements IGame {
 		this.lastUpdateTime = LocalDateTime.now();
 	}
 
+	public void markACell(CellPosition position) {
+		validateGame();
+		grid.markACell(position);
+	}
+
+	public void unmarkACell(CellPosition position) {
+		validateGame();
+		grid.unmarkACell(position);
+	}
+
+	public void flagACell(CellPosition position) {
+		validateGame();
+		grid.flagACell(position);
+	}
+
+	public void unflagACell(CellPosition position) {
+		validateGame();
+		grid.unflagACell(position);
+	}
+
+	public void uncoverACell(CellPosition position) {
+		validateGame();
+		try {
+			grid.uncoverACell(position);
+		} catch (GameOverException e) {
+			status = e.getStatus();
+		}
+		recalculateDuration();
+	}
+
+	private void validateGame() {
+		if (isGameOver() || isPaused()) {
+			throw new InvalidActionException();
+		}
+	}
+
 	private boolean isOngoing() {
 		return GameStatus.ONGOING.equals(status);
 	}
@@ -76,7 +110,7 @@ public class Game implements IGame {
 	}
 
 	private boolean isGameOver() {
-		return GameStatus.ENDED.equals(status);
+		return GameStatus.WON.equals(status) || GameStatus.LOST.equals(status);
 	}
 
 	public static final class GameBuilder {

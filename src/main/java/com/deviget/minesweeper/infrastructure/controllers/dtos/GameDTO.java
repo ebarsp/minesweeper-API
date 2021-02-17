@@ -13,44 +13,44 @@ public class GameDTO {
 	@JsonProperty
 	private final String duration;
 	@JsonProperty
-	private final GridDTO grid;
+	private final GridResponseDTO grid;
 
-	public GameDTO(GameDTOBuilder builder) {
+	public GameDTO(Builder builder) {
 		this.id = builder.id;
 		this.duration = builder.duration;
 		this.status = builder.status;
 		this.grid = builder.grid;
 	}
 
-	public static final class GameDTOBuilder {
+	public static final class Builder {
 		private UUID id;
 		private GameStatus status;
 		private String duration;
-		private GridDTO grid;
+		private GridResponseDTO grid;
 
-		private GameDTOBuilder() {
+		private Builder() {
 		}
 
-		public static GameDTOBuilder aGameDTO() {
-			return new GameDTOBuilder();
+		public static Builder aGameDTO() {
+			return new Builder();
 		}
 
-		public GameDTOBuilder withId(UUID id) {
+		public Builder withId(UUID id) {
 			this.id = id;
 			return this;
 		}
 
-		public GameDTOBuilder withStatus(GameStatus status) {
+		public Builder withStatus(GameStatus status) {
 			this.status = status;
 			return this;
 		}
 
-		public GameDTOBuilder withDuration(String duration) {
+		public Builder withDuration(String duration) {
 			this.duration = duration;
 			return this;
 		}
 
-		public GameDTOBuilder withGrid(GridDTO grid) {
+		public Builder withGrid(GridResponseDTO grid) {
 			this.grid = grid;
 			return this;
 		}

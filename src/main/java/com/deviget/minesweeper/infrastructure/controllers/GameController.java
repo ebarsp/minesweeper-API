@@ -1,8 +1,9 @@
 package com.deviget.minesweeper.infrastructure.controllers;
 
+import com.deviget.minesweeper.domain.CellPosition;
 import com.deviget.minesweeper.domain.IGame;
 import com.deviget.minesweeper.infrastructure.controllers.dtos.GameDTO;
-import com.deviget.minesweeper.infrastructure.controllers.dtos.GridDTO;
+import com.deviget.minesweeper.infrastructure.controllers.dtos.GridPayloadDTO;
 import com.deviget.minesweeper.infrastructure.controllers.mappers.GameMapper;
 import com.deviget.minesweeper.application.GameService;
 import com.deviget.minesweeper.infrastructure.controllers.mappers.GridMapper;
@@ -32,7 +33,7 @@ public class GameController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public GameDTO create(@RequestBody GridDTO grid) {
+	public GameDTO create(@RequestBody GridPayloadDTO grid) {
 		final IGame game = gameService.create(gridMapper.apiToDomain(grid));
 		return gameMapper.domainToApi(game);
 	}
@@ -50,5 +51,30 @@ public class GameController {
 	@PostMapping("/{id}/unpause")
 	public GameDTO unpause(@PathVariable UUID id) {
 		return gameMapper.domainToApi(gameService.unpause(id));
+	}
+
+	@PostMapping("/{id}/cells/{x}/{y}/uncover")
+	public GameDTO uncoverACell(@PathVariable UUID id, @PathVariable Integer x, @PathVariable Integer y) {
+		return gameMapper.domainToApi(gameService.uncoverACell(id, new CellPosition(x, y)));
+	}
+
+	@PostMapping("/{id}/cells/{x}/{y}/mark")
+	public GameDTO markACell(@PathVariable UUID id, @PathVariable Integer x, @PathVariable Integer y) {
+		return gameMapper.domainToApi(gameService.markACell(id, new CellPosition(x, y)));
+	}
+
+	@PostMapping("/{id}/cells/{x}/{y}/unmark")
+	public GameDTO unmarkACell(@PathVariable UUID id, @PathVariable Integer x, @PathVariable Integer y) {
+		return gameMapper.domainToApi(gameService.unmarkACell(id, new CellPosition(x, y)));
+	}
+
+	@PostMapping("/{id}/cells/{x}/{y}/flag")
+	public GameDTO flagACell(@PathVariable UUID id, @PathVariable Integer x, @PathVariable Integer y) {
+		return gameMapper.domainToApi(gameService.flagACell(id, new CellPosition(x, y)));
+	}
+
+	@PostMapping("/{id}/cells/{x}/{y}/unflag")
+	public GameDTO unflagACell(@PathVariable UUID id, @PathVariable Integer x, @PathVariable Integer y) {
+		return gameMapper.domainToApi(gameService.unflagACell(id, new CellPosition(x, y)));
 	}
 }

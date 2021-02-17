@@ -5,7 +5,7 @@ import java.util.UUID;
 public interface IGame {
 	UUID getId();
 
-	GameGrid getGrid();
+	IGameGrid getGrid();
 
 	GameStatus getStatus();
 

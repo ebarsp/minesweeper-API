@@ -8,10 +8,12 @@ import com.deviget.minesweeper.domain.GameStatus;
 import com.deviget.minesweeper.domain.IGame;
 import com.deviget.minesweeper.application.NotFoundException;
 import com.deviget.minesweeper.application.RepositoryException;
+import com.deviget.minesweeper.domain.InvalidActionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -81,7 +83,7 @@ public class GameServiceTest {
 	}
 
 	@Test
-	public void givenAnOngoingGame_whenPauseIt_thenGameIsPaused() {
+	public void givenAnOngoingGame_whenPauseIt_thenGameIsPaused() throws InvalidActionException {
 		final IGame existent = instance.create(grid);
 
 		when(repository.get(existent.getId())).thenReturn(Optional.of((Game) existent));
@@ -102,7 +104,7 @@ public class GameServiceTest {
 
 
 	@Test
-	public void givenAPausedGame_whenUnpauseIt_thenGameIsOngoing() {
+	public void givenAPausedGame_whenUnpauseIt_thenGameIsOngoing() throws InvalidActionException {
 		final IGame existent = instance.create(grid);
 
 		when(repository.get(existent.getId())).thenReturn(Optional.of((Game) existent));
@@ -127,6 +129,7 @@ public class GameServiceTest {
 
 	private GameGrid getGrid() {
 		return GameGrid.GridBuilder.aGrid()
+				.withCells(Map.of())
 				.withWidth(10)
 				.withHeight(10)
 				.withMines(3)

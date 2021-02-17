@@ -1,5 +1,6 @@
 package com.deviget.minesweeper.application;
 
+import com.deviget.minesweeper.domain.CellPosition;
 import com.deviget.minesweeper.domain.Game;
 import com.deviget.minesweeper.domain.GameGrid;
 import com.deviget.minesweeper.domain.GameStatus;
@@ -49,6 +50,7 @@ public class GameService {
 	/**
 	 * Pause an ongoing Game
 	 * @param id
+	 * @return the paused {@link Game}
 	 * @throws {@link NotFoundException} if there is not a game with the param id
 	 */
 	public IGame pause(UUID id) {
@@ -62,12 +64,88 @@ public class GameService {
 	/**
 	 * Unpause a paused Game
 	 * @param id
+	 * @return the ongoing {@link Game}
 	 * @throws {@link NotFoundException} if there is not a game with the param id
 	 */
 	public IGame unpause(UUID id) {
 		final Game game = gameRepository.get(id)
 				.orElseThrow(NotFoundException::new);
 		game.unpause();
+		gameRepository.save(game);
+		return game;
+	}
+
+	/**
+	 * Uncover a Game's cell indicated by a position
+	 * @param id
+	 * @param position
+	 * @return the current {@link Game}
+	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 */
+	public IGame uncoverACell(UUID id, CellPosition position) {
+		final Game game = gameRepository.get(id)
+				.orElseThrow(NotFoundException::new);
+		game.uncoverACell(position);
+		gameRepository.save(game);
+		return game;
+	}
+
+	/**
+	 * Mark a Game's cell indicated by a position
+	 * @param id
+	 * @param position
+	 * @return the ongoing {@link Game}
+	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 */
+	public IGame markACell(UUID id, CellPosition position) {
+		final Game game = gameRepository.get(id)
+				.orElseThrow(NotFoundException::new);
+		game.markACell(position);
+		gameRepository.save(game);
+		return game;
+	}
+
+	/**
+	 * Unmark a marked Game's cell indicated by position
+	 * @param id
+	 * @param position
+	 * @return the ongoing {@link Game}
+	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 */
+	public IGame unmarkACell(UUID id, CellPosition position) {
+		final Game game = gameRepository.get(id)
+				.orElseThrow(NotFoundException::new);
+		game.unmarkACell(position);
+		gameRepository.save(game);
+		return game;
+	}
+
+	/**
+	 * Flag a Game's cell indicated by a position
+	 * @param id
+	 * @param position
+	 * @return the ongoing {@link Game}
+	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 */
+	public IGame flagACell(UUID id, CellPosition position) {
+		final Game game = gameRepository.get(id)
+				.orElseThrow(NotFoundException::new);
+		game.flagACell(position);
+		gameRepository.save(game);
+		return game;
+	}
+
+	/**
+	 * Unflag a flagged Game's cell indicated by position
+	 * @param id
+	 * @param position
+	 * @return the ongoing {@link Game}
+	 * @throws {@link NotFoundException} if there is not a game with the param id
+	 */
+	public IGame unflagACell(UUID id, CellPosition position) {
+		final Game game = gameRepository.get(id)
+				.orElseThrow(NotFoundException::new);
+		game.unflagACell(position);
 		gameRepository.save(game);
 		return game;
 	}
